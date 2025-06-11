@@ -26,7 +26,6 @@ Repository = "https://github.com/reven-project/reven.git"
 [project.scripts]
 reven = "reven.main:main"
 
-
 [build-system]
 requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
