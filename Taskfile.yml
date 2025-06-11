@@ -1,0 +1,16 @@
+version: 3
+
+tasks:
+  clean:
+    cmds:
+      - rm -r .venv/ dist/
+      - python -m venv .venv
+  install:
+    cmds:
+      - source .venv/bin/activate && pip install -r requirements.txt
+  build:
+    cmds:
+      - source .venv/bin/activate && python -m build
+  publish:
+    cmds:
+      - twine upload dist/*.tar.gz
