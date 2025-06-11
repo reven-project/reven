@@ -1,0 +1,38 @@
+[project]
+name = "reven"
+version = "0.1"
+dependencies = [
+    "attrs==25.3.0",
+    "cattrs==25.1.1",
+    "typer==0.16.0",
+    "PyYAML==6.0.2",
+    "dataclass-wizard==0.35.0",
+    "scikit-learn==1.7.0",
+    "UpSetPlot==0.9.0",
+    "PyQt6==6.9.1",
+]
+authors = [
+    { name = "Norbert Arkadiusz Görke", email = "me@ngorke.dev" },
+    { name = "Magnust Hektoen Steensland", email = "mag.steensland@gmail.com" },
+]
+license = "Apache-2.0"
+description = "Flexible reverse engineering tool for analyzing many files at once."
+readme = { file = "README.md", content-type = "text/markdown" }
+keywords = ["reverse engineering"]
+
+[project.urls]
+
+
+[project.scripts]
+reven = "reven.main:main"
+
+
+[build-system]
+requires = ["pdm-backend >= 2.4.4", "setuptools", "wheel"]
+build-backend = "pdm.backend"
+
+[tool.pdm]
+distribution = true
+
+[tool.pdm.build]
+run-setuptools = true
