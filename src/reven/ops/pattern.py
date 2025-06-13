@@ -100,6 +100,10 @@ class Pattern:
         return self.string
 
 
+cattr.global_converter.register_unstructure_hook(Pattern, lambda x: x.string)
+cattr.global_converter.register_structure_hook(Pattern, lambda x, cls: cls(x))
+
+
 def bytes_and(a: bytes, b: bytes) -> Iterator[int]:
     return (a & b for a, b in zip(a, b))
 
