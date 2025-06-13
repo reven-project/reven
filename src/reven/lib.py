@@ -28,17 +28,11 @@ import yaml
 from rich.table import Table
 from rich import print
 from rich.markup import escape
-from dataclass_wizard import YAMLWizard
 
 
 class InputFormat(str, Enum):
     FILE_LIST = "file_list"
     YAML = "yaml"
-
-
-class YAML(YAMLWizard):
-    def __init_subclass__(cls):
-        super().__init_subclass__(key_transform="NONE")
 
 
 class TabularColumn:

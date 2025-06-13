@@ -1,16 +1,18 @@
 from dataclasses import dataclass
 import io
 import sys
+import yaml
+import cattr
+import typer
 
 from typing_extensions import Annotated
-import typer
-from reven.lib import YAML, InputFormat, is_tty
+from reven.lib import InputFormat, is_tty
 
 app = typer.Typer()
 
 
 @dataclass
-class SliceResult(YAML):
+class SliceResult:
     file_name: str
     length: int
     data: bytes
@@ -20,6 +22,12 @@ class SliceResult(YAML):
 class NumWithSign:
     sign: int
     num: int
+
+
+@dataclass
+class _Input:
+    file_name: str
+    position: int
 
 
 def parse_num(s: str):
@@ -84,13 +92,7 @@ def slice(
                 )
 
             case InputFormat.YAML:
-
-                @dataclass
-                class Input(YAML):
-                    file_name: str
-                    position: int
-
-                in_dtos: list[Input] = Input.from_yaml(sys.stdin.read())
+                in_dtos = cattr.structure(yaml.safe_load(sys.stdin), list[_Input])
                 piped_inputs = set((dto.file_name, dto.position) for dto in in_dtos)
 
         inputs.update(
@@ -122,5 +124,4 @@ def slice(
         )
 
     dtos = sorted(dtos, key=lambda x: x.file_name)
-
-    output.write(SliceResult.list_to_yaml(dtos))
+    yaml.safe_dump(cattr.unstructure(dtos), output)
