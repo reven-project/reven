@@ -9,10 +9,17 @@ import math
 import reven.fast.pattern as pattern_fast
 import functools
 import io
+import yaml
+import cattr
 from typing import Iterator, Union, Literal
-from reven.lib import YAML, InputFormat, Nibbles, is_tty
+from reven.lib import InputFormat, Nibbles, is_tty
 
 app = typer.Typer()
+
+
+@dataclass
+class _Input:
+    data: bytes
 
 
 class Pattern:
@@ -93,6 +100,10 @@ class Pattern:
         return self.string
 
 
+cattr.global_converter.register_unstructure_hook(Pattern, lambda x: x.string)
+cattr.global_converter.register_structure_hook(Pattern, lambda x, cls: cls(x))
+
+
 def bytes_and(a: bytes, b: bytes) -> Iterator[int]:
     return (a & b for a, b in zip(a, b))
 
@@ -109,13 +120,13 @@ def find_pattern(bufs: list[Nibbles]) -> Pattern:
 
 
 @dataclass
-class PatternCluster(YAML):
+class PatternCluster:
     files: list[str]
     pattern: Pattern
 
 
 @dataclass
-class PatternClusters(YAML):
+class PatternClusters:
     clusters: list[PatternCluster]
     unclustered: PatternCluster | None
 
@@ -157,7 +168,7 @@ def find_patterns_grouped(
     )
 
     if output:
-        output.write(pattern_clusters.to_yaml())
+        yaml.safe_dump(cattr.unstructure(pattern_clusters), output)
     return pattern_clusters
 
 
@@ -193,15 +204,12 @@ def find_patterns(
                     for file in sys.stdin.read().split()
                 )
             case InputFormat.YAML:
-
-                @dataclass
-                class InputDTO(YAML):
-                    data: bytes
-
                 datas.extend(
                     [
                         dto.data[start_offset:]
-                        for dto in InputDTO.from_yaml(sys.stdin.read())
+                        for dto in cattr.structure(
+                            yaml.safe_load(sys.stdin), list[_Input]
+                        )
                     ]
                 )
 
